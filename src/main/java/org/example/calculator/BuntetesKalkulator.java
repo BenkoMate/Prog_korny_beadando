@@ -12,6 +12,7 @@ public class BuntetesKalkulator {
 
         switch (kartyaSzin.toLowerCase().trim()) {
             case "sarga":
+            case "sárga":
                 return 5000;
             case "piros":
                 return 20000;
