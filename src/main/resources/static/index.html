@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Foci Kalkulátorok és Adatbázis</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        h1 { text-align: center; color: #333; }
+        .container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+
+        .card { background: white; padding: 15px; border: 1px solid #ccc; width: 300px; }
+        .card.db { width: 100%; max-width: 800px; }
+
+        h3 { margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        label { font-weight: bold; font-size: 14px; }
+        input { width: 100%; padding: 5px; margin: 5px 0 15px 0; border: 1px solid #999; }
+
+        button { width: 100%; padding: 8px; background-color: #007bff; color: white; border: 1px solid #0056b3; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+
+        .res { margin-top: 15px; background: #e9ecef; border: 1px solid #ccc; padding: 10px; font-family: monospace; font-size: 13px; min-height: 50px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; color: black; }
+    </style>
+</head>
+<body>
+
+<h1>Foci Webszolgáltatás</h1>
+
+<div class="container">
+    <div class="card">
+        <h3>Bajnoki Pontok</h3>
+        <label>Gy / D / V:</label>
+        <div style="display:flex; gap:5px;">
+            <input type="number" id="gy" value="0">
+            <input type="number" id="d" value="0">
+            <input type="number" id="v" value="0">
+        </div>
+        <button onclick="apiCall('/api/kalkulator/pontok?gyozelem=' + document.getElementById('gy').value + '&dontetlen=' + document.getElementById('d').value + '&vereseg=' + document.getElementById('v').value, 'res1')">Számítás</button>
+        <div id="res1" class="res">...</div>
+    </div>
+
+    <div class="card">
+        <h3>Mezszám Ellenőr</h3>
+        <label>Kért mezszám:</label>
+        <input type="number" id="mezszam" value="10">
+        <button onclick="apiCall('/api/kalkulator/valid/mezszam?szam=' + document.getElementById('mezszam').value, 'res2')">Érvényesség Vizsgálata</button>
+        <div id="res2" class="res">...</div>
+    </div>
+
+    <div class="card">
+        <h3>Átigazolás Monitor</h3>
+        <div style="display:flex; justify-content: space-between; gap: 5px;">
+            <div style="width: 30%;">
+                <label>Kor:</label>
+                <input type="number" id="kor" value="20">
+            </div>
+            <div style="width: 40%;">
+                <label>Ár (M Ft):</label>
+                <input type="number" step="0.1" id="ar" value="15.5">
+            </div>
+            <div style="width: 30%;">
+                <label>Év:</label>
+                <input type="number" id="evek" value="4">
+            </div>
+        </div>
+        <button style="margin-top: 15px;" onclick="apiCall('/api/kalkulator/valid/atigazolas?kor=' + document.getElementById('kor').value + '&arMillio=' + document.getElementById('ar').value + '&szerzodesEvek=' + document.getElementById('evek').value, 'res3')">Értékelés</button>
+        <div id="res3" class="res">...</div>
+    </div>
+
+    <div class="card db">
+        <h3>Adatbázis - Játékosok Listája</h3>
+        <p style="font-size: 13px; color: #555;">Kattints a gombra az adatbázisban lévő játékosok betöltéséhez.</p>
+        <button onclick="apiCall('/api/focistak/lista', 'res4')">Lekérdezés Indítása</button>
+        <div id="res4" class="res">...</div>
+    </div>
+    <div class="card">
+        <h3>Csapat Statisztikák</h3>
+
+        <div style="border-bottom: 1px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px;">
+            <div style="display:flex; gap: 5px;">
+                <div style="width: 50%;">
+                    <label>Pontszám:</label>
+                    <input type="number" id="pont" value="45">
+                </div>
+                <div style="width: 50%;">
+                    <label>Gólkülönbség:</label>
+                    <input type="number" id="golkul" value="12">
+                </div>
+            </div>
+            <button onclick="apiCall('/api/kalkulator/zona?pontszam=' + document.getElementById('pont').value + '&golKulonbseg=' + document.getElementById('golkul').value, 'res5')">Zóna Meghatározása</button>
+        </div>
+
+        <div style="display:flex; gap: 5px;">
+            <div style="width: 50%;">
+                <label>Lőtt gólok:</label>
+                <input type="number" id="golok" value="45">
+            </div>
+            <div style="width: 50%;">
+                <label>Meccsek:</label>
+                <input type="number" id="meccsek" value="30">
+            </div>
+        </div>
+        <button onclick="apiCall('/api/kalkulator/golatlag?lottGolok=' + document.getElementById('golok').value + '&meccsekSzama=' + document.getElementById('meccsek').value, 'res5')">Gólátlag Kiszámítása</button>
+
+        <div id="res5" class="res">...</div>
+    </div>
+</div>
+
+<script>
+    async function apiCall(url, displayId) {
+        try {
+            let valasz = await fetch(url);
+            let jsonAdat = await valasz.json();
+
+            document.getElementById(displayId).innerText = JSON.stringify(jsonAdat, null, 2);
+
+        } catch (hiba) {
+            document.getElementById(displayId).innerText = "Hiba! Nem sikerült elérni a szervert.";
+        }
+    }
+</script>
+
+</body>
+</html>
